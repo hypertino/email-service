@@ -17,7 +17,7 @@ import com.hypertino.hyperbus.subscribe.Subscribable
 import com.hypertino.hyperbus.transport.api.ServiceRegistrator
 import com.hypertino.hyperbus.transport.registrators.DummyRegistrator
 import com.hypertino.service.config.ConfigLoader
-import com.hypertino.services.email.apiref.email.{EmailMessage, EmailsPost}
+import com.hypertino.services.email.apiref.email.EmailsPost
 import com.typesafe.config.Config
 import monix.execution.Scheduler
 import org.jvnet.mock_javamail.Mailbox

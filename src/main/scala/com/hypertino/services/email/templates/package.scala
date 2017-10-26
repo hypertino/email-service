@@ -28,6 +28,6 @@ package object templates {
   type Obj=com.hypertino.binders.value.Obj
   type Lst=com.hypertino.binders.value.Lst
   type Bool=com.hypertino.binders.value.Bool
-  type EmailMessage = com.hypertino.services.email.EmailMessage
+  type Email = com.hypertino.services.email.Email
   val Null=com.hypertino.binders.value.Null
 }

@@ -90,7 +90,7 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
     }
   }
 
-  private def runTemplate(body: email.EmailMessage): Option[EmailMessage] = {
+  private def runTemplate(body: email.EmailMessage): Option[Email] = {
     // todo: parse language: AcceptLanguage and cache all classes
     val templateClass = templateCache.get((body.template,None), new Callable[Option[Class[_]]] {
       override def call() = {
@@ -102,7 +102,7 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
     templateClass.map { tc ⇒
       val args: Array[Object] = Array(body.data.asInstanceOf[AnyRef])
       val c = tc.getConstructor(classOf[Value])
-      c.newInstance(args:_*).asInstanceOf[EmailMessage]
+      c.newInstance(args:_*).asInstanceOf[Email]
     }
   }
 
