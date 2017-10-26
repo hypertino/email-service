@@ -12,7 +12,7 @@ publishArtifact in Test := false
 pomIncludeRepository := { _ => false}
 
 pomExtra :=
-  <url>https://github.com/hypertino/auth-pin-service</url>
+  <url>https://github.com/hypertino/email-service</url>
     <licenses>
       <license>
         <name>MPL-2.0</name>
@@ -21,8 +21,8 @@ pomExtra :=
       </license>
     </licenses>
     <scm>
-      <url>git@github.com:hypertino/auth-pin-service.git</url>
-      <connection>scm:git:git@github.com:hypertino/auth-pin-service.git</connection>
+      <url>git@github.com:hypertino/email-service.git</url>
+      <connection>scm:git:git@github.com:hypertino/email-service.git</connection>
     </scm>
     <developers>
       <developer>
