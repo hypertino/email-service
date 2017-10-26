@@ -8,13 +8,13 @@
 
 package com.hypertino.services.email
 
-import java.util.Properties
+import java.util.{Locale, Properties}
 import java.util.concurrent.{Callable, TimeUnit}
 import javax.mail.internet.{InternetAddress, MimeMessage}
 import javax.mail.{Message, PasswordAuthentication, Session, Transport}
 
 import com.google.common.cache.{Cache, CacheBuilder}
-import com.hypertino.binders.value.Value
+import com.hypertino.binders.value.{Null, Value}
 import com.hypertino.hyperbus.Hyperbus
 import com.hypertino.hyperbus.model.{Accepted, BadRequest, DynamicBody, EmptyBody, ErrorBody}
 import com.hypertino.hyperbus.subscribe.Subscribable
@@ -22,6 +22,7 @@ import com.hypertino.inflector.naming.DashCaseToPascalCaseConverter
 import com.hypertino.service.control.api.Service
 import com.hypertino.services.email.apiref.email
 import com.hypertino.services.email.apiref.email.EmailsPost
+import com.hypertino.template.utils.LanguageRanges
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.StrictLogging
 import monix.eval.Task
@@ -38,7 +39,8 @@ case class EmailServiceConfig(
                               smtpUser: Option[String],
                               smtpPassword: Option[String],
                               sender: Option[String],
-                              senderName: Option[String]
+                              senderName: Option[String],
+                              templateData: Value = Null
                              )
 
 class EmailService(implicit val injector: Injector) extends Service with Injectable with Subscribable with StrictLogging {
@@ -91,7 +93,7 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
   }
 
   private def runTemplate(body: email.EmailMessage): Option[Email] = {
-    // todo: parse language: AcceptLanguage and cache all classes
+    // todo: language specific template classes for more custom l10n?
     val templateClass = templateCache.get((body.template,None), new Callable[Option[Class[_]]] {
       override def call() = {
         val className = "com.hypertino.services.email.templates." + DashCaseToPascalCaseConverter.convert(body.template)
@@ -100,8 +102,17 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
     })
 
     templateClass.map { tc ⇒
-      val args: Array[Object] = Array(body.data.asInstanceOf[AnyRef])
-      val c = tc.getConstructor(classOf[Value])
+      val (c, args) = try {
+        val c = tc.getConstructor(classOf[Value], classOf[LanguageRanges])
+        val data = config.templateData % body.data
+        (c, Array(data.asInstanceOf[AnyRef], body.language.map(LanguageRanges(_)).getOrElse(LanguageRanges.default)))
+      } catch {
+        case _: NoSuchMethodException ⇒
+          val c = tc.getConstructor(classOf[Value])
+          val data = config.templateData % body.data
+          (c, Array(data.asInstanceOf[AnyRef]))
+      }
+
       c.newInstance(args:_*).asInstanceOf[Email]
     }
   }

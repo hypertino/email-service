@@ -63,6 +63,27 @@ class EmailServiceSpec extends FlatSpec with Module with BeforeAndAfterAll with 
     val msg = inbox.get(0)
     msg.getSubject shouldBe "Hello"
     msg.getAllRecipients.map(_.asInstanceOf[InternetAddress].getAddress) should contain("john@example.com")
-    msg.getContent shouldBe "<p>Hello <strong>John</strong><hr />How are you?</p>"
+    msg.getContent shouldBe "<p>Hello <strong>John</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: color</p></p>"
+    inbox.clear()
+  }
+
+  it should "send email according to language" in {
+    val c = hyperbus
+      .ask(EmailsPost(apiref.email.EmailMessage("test-email", Some("en-uk"), Obj.from(
+        "user" → Obj.from(
+          "email" → "boris@example.com",
+          "name" → "Boris"
+        )
+      ))))
+      .runAsync
+      .futureValue
+
+    val inbox = Mailbox.get("boris@example.com")
+    inbox.size shouldBe 1
+    val msg = inbox.get(0)
+    msg.getSubject shouldBe "Hello"
+    msg.getAllRecipients.map(_.asInstanceOf[InternetAddress].getAddress) should contain("boris@example.com")
+    msg.getContent shouldBe "<p>Hello <strong>Boris</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: colour</p></p>"
+    inbox.clear()
   }
 }
