@@ -8,8 +8,8 @@
 
 package com.hypertino.services.email
 
-import java.util.{Locale, Properties}
-import java.util.concurrent.{Callable, TimeUnit}
+import java.util.Properties
+import java.util.concurrent.Callable
 import javax.mail.internet.{InternetAddress, MimeMessage}
 import javax.mail.{Message, PasswordAuthentication, Session, Transport}
 
@@ -20,8 +20,7 @@ import com.hypertino.hyperbus.model.{Accepted, BadRequest, DynamicBody, EmptyBod
 import com.hypertino.hyperbus.subscribe.Subscribable
 import com.hypertino.inflector.naming.DashCaseToPascalCaseConverter
 import com.hypertino.service.control.api.Service
-import com.hypertino.services.email.apiref.email
-import com.hypertino.services.email.apiref.email.EmailsPost
+import com.hypertino.services.email.api.EmailsPost
 import com.hypertino.template.utils.LanguageRanges
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.StrictLogging
@@ -92,7 +91,7 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
     }
   }
 
-  private def runTemplate(body: email.EmailMessage): Option[Email] = {
+  private def runTemplate(body: api.EmailMessage): Option[Email] = {
     // todo: language specific template classes for more custom l10n?
     val templateClass = templateCache.get((body.template,None), new Callable[Option[Class[_]]] {
       override def call() = {

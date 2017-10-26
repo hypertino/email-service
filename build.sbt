@@ -26,7 +26,7 @@ lazy val `email-service` = project in file(".") enablePlugins Raml2Hyperbus sett
     ramlHyperbusSources := Seq(
       ramlSource(
         path = "api/email-service-api/email.raml",
-        packageName = "com.hypertino.services.email.apiref.email",
+        packageName = "com.hypertino.services.email.api",
         isResource = false
       )
     )

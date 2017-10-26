@@ -17,7 +17,7 @@ import com.hypertino.hyperbus.subscribe.Subscribable
 import com.hypertino.hyperbus.transport.api.ServiceRegistrator
 import com.hypertino.hyperbus.transport.registrators.DummyRegistrator
 import com.hypertino.service.config.ConfigLoader
-import com.hypertino.services.email.apiref.email.EmailsPost
+import com.hypertino.services.email.api.EmailsPost
 import com.typesafe.config.Config
 import monix.execution.Scheduler
 import org.jvnet.mock_javamail.Mailbox
@@ -49,7 +49,7 @@ class EmailServiceSpec extends FlatSpec with Module with BeforeAndAfterAll with 
 
   "EmailService" should "send email" in {
     val c = hyperbus
-      .ask(EmailsPost(apiref.email.EmailMessage("test-email", None, Obj.from(
+      .ask(EmailsPost(api.EmailMessage("test-email", None, Obj.from(
         "user" → Obj.from(
           "email" → "john@example.com",
           "name" → "John"
@@ -69,7 +69,7 @@ class EmailServiceSpec extends FlatSpec with Module with BeforeAndAfterAll with 
 
   it should "send email according to language" in {
     val c = hyperbus
-      .ask(EmailsPost(apiref.email.EmailMessage("test-email", Some("en-uk"), Obj.from(
+      .ask(EmailsPost(api.EmailMessage("test-email", Some("en-uk"), Obj.from(
         "user" → Obj.from(
           "email" → "boris@example.com",
           "name" → "Boris"
