@@ -134,7 +134,7 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
     val authenticator: Authenticator = config.smtpUser.map { userName ⇒
       props.setProperty("mail.smtp.auth", "true")
       new Authenticator {
-        override def getPasswordAuthentication(): PasswordAuthentication = {
+        override def getPasswordAuthentication: PasswordAuthentication = {
           new PasswordAuthentication(userName, config.smtpPassword.getOrElse(""))
         }
       }
