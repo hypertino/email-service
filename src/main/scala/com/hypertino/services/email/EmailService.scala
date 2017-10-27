@@ -16,7 +16,7 @@ import javax.mail._
 import com.google.common.cache.{Cache, CacheBuilder}
 import com.hypertino.binders.value.{Null, Value}
 import com.hypertino.hyperbus.Hyperbus
-import com.hypertino.hyperbus.model.{Accepted, BadRequest, DynamicBody, EmptyBody, ErrorBody}
+import com.hypertino.hyperbus.model.{Accepted, BadRequest, DynamicBody, EmptyBody, ErrorBody, InternalServerError}
 import com.hypertino.hyperbus.subscribe.Subscribable
 import com.hypertino.inflector.naming.DashCaseToPascalCaseConverter
 import com.hypertino.service.control.api.Service
@@ -31,6 +31,7 @@ import scaldi.{Injectable, Injector}
 import scala.concurrent._
 import scala.concurrent.duration.FiniteDuration
 import scala.util.Try
+import scala.util.control.NonFatal
 
 case class EmailServiceConfig(
                               smtpHost: String,
@@ -82,7 +83,15 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
           }
           e.html.foreach(s ⇒ m.setContent(s, "text/html"))
           e.text.foreach(s ⇒ m.setText(s))
-          blocking(Transport.send(m))
+          try {
+            blocking(Transport.send(m))
+          }
+          catch {
+            case NonFatal(ex) ⇒
+              val internalError = InternalServerError(ErrorBody("smtp-failure", Some(ex.getMessage)))
+              logger.error(s"Can't send email #${internalError.body.errorId}", ex)
+              throw internalError
+          }
           Accepted(EmptyBody)
         }
       } getOrElse {
