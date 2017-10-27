@@ -11,7 +11,7 @@ package com.hypertino.services.email
 import java.util.Properties
 import java.util.concurrent.Callable
 import javax.mail.internet.{InternetAddress, MimeMessage}
-import javax.mail.{Message, PasswordAuthentication, Session, Transport}
+import javax.mail._
 
 import com.google.common.cache.{Cache, CacheBuilder}
 import com.hypertino.binders.value.{Null, Value}
@@ -37,6 +37,8 @@ case class EmailServiceConfig(
                               smtpPort: Option[Int],
                               smtpUser: Option[String],
                               smtpPassword: Option[String],
+                              smtpStartTls: Option[Boolean],
+                              smtpSsl: Option[Boolean],
                               sender: Option[String],
                               senderName: Option[String],
                               templateData: Value = Null
@@ -120,15 +122,27 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
     val props = new Properties(System.getProperties)
     props.setProperty("mail.smtp.host", config.smtpHost)
 
-    val authenticator = config.smtpUser.map { userName ⇒
+    val authenticator: Authenticator = config.smtpUser.map { userName ⇒
       props.setProperty("mail.smtp.auth", "true")
-      new PasswordAuthentication(userName, config.smtpPassword.getOrElse(""))
+      new Authenticator {
+        override def getPasswordAuthentication(): PasswordAuthentication = {
+          new PasswordAuthentication(userName, config.smtpPassword.getOrElse(""))
+        }
+      }
     } getOrElse {
       null
     }
 
-    config.smtpPort.foreach(port ⇒ props.setProperty("mail.smtp.port", port.toString))
-    Session.getInstance(props)
+    config.smtpPort.foreach { port ⇒
+      props.setProperty("mail.smtp.port", port.toString)
+    }
+    config.smtpStartTls.foreach { enable ⇒
+      props.setProperty("mail.smtp.starttls.enable", enable.toString)
+    }
+    config.smtpSsl.foreach { enable ⇒
+      props.setProperty("mail.imap.ssl.enable", enable.toString)
+    }
+    Session.getInstance(props, authenticator)
   }
 
   private def address(a: (String, Option[String])) = a._2.map { n ⇒
