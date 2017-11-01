@@ -81,8 +81,8 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
           e.bccRecipients.foreach { r ⇒
             m.addRecipient(Message.RecipientType.TO, address(r))
           }
-          e.html.foreach(s ⇒ m.setContent(s, "text/html"))
-          e.text.foreach(s ⇒ m.setText(s, e.charset))
+          e.html.foreach(s ⇒ m.setContent(s, s"text/html; charset=${e.charset}"))
+          e.text.foreach(s ⇒ m.setText(s, s"text/plain; charset=${e.charset}"))
           try {
             blocking(Transport.send(m))
           }
