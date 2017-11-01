@@ -70,7 +70,7 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
       from.map { sender ⇒
         Task.eval {
           val m = new MimeMessage(session)
-          m.setSubject(e.subject)
+          m.setSubject(e.subject, e.charset)
           m.setFrom(address(sender))
           e.recipients.foreach { r ⇒
             m.addRecipient(Message.RecipientType.TO, address(r))
@@ -82,12 +82,12 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
             m.addRecipient(Message.RecipientType.TO, address(r))
           }
           e.html.foreach(s ⇒ m.setContent(s, "text/html"))
-          e.text.foreach(s ⇒ m.setText(s))
+          e.text.foreach(s ⇒ m.setText(s, e.charset))
           try {
             blocking(Transport.send(m))
           }
           catch {
-            case NonFatal(ex) ⇒
+            case ex: Throwable ⇒
               val internalError = InternalServerError(ErrorBody("smtp-failure", Some(ex.getMessage)))
               logger.error(s"Can't send email #${internalError.body.errorId}", ex)
               throw internalError

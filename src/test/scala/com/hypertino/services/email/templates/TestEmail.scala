@@ -10,7 +10,7 @@ class TestEmail($: Value, implicit val l: LanguageRanges) extends Email(
     hr,
     "How are you?",
     a(href:=$("site.test-url")+"/abcde")("read more"),
-    p("color: ", r("color"))
+    p("color: ", r("color"), ".\"'\"")
   )
 )
 

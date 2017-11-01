@@ -63,7 +63,7 @@ class EmailServiceSpec extends FlatSpec with Module with BeforeAndAfterAll with 
     val msg = inbox.get(0)
     msg.getSubject shouldBe "Hello"
     msg.getAllRecipients.map(_.asInstanceOf[InternetAddress].getAddress) should contain("john@example.com")
-    msg.getContent shouldBe "<p>Hello <strong>John</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: color</p></p>"
+    msg.getContent shouldBe "<p>Hello <strong>John</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: color.&quot;'&quot;</p></p>"
     inbox.clear()
   }
 
@@ -83,7 +83,7 @@ class EmailServiceSpec extends FlatSpec with Module with BeforeAndAfterAll with 
     val msg = inbox.get(0)
     msg.getSubject shouldBe "Hello"
     msg.getAllRecipients.map(_.asInstanceOf[InternetAddress].getAddress) should contain("boris@example.com")
-    msg.getContent shouldBe "<p>Hello <strong>Boris</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: colour</p></p>"
+    msg.getContent shouldBe "<p>Hello <strong>Boris</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: colour.&quot;'&quot;</p></p>"
     inbox.clear()
   }
 }

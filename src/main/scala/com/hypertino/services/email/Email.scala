@@ -9,5 +9,6 @@ class Email(
              val from: Option[String] = None,
              val fromName: Option[String] = None,
              val html: Option[String] = None,
-             val text: Option[String] = None
+             val text: Option[String] = None,
+             val charset: String = "UTF-8"
            )
