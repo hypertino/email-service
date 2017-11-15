@@ -31,3 +31,4 @@ lazy val `email-service` = project in file(".") enablePlugins Raml2Hyperbus sett
       )
     )
 )
+
