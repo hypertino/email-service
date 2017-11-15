@@ -20,7 +20,7 @@ lazy val `email-service` = project in file(".") enablePlugins Raml2Hyperbus sett
       "com.hypertino" %% "service-config" % "0.2.0" % "test",
       "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
       "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % "test",
-//      "org.jvnet.mock-javamail" % "mock-javamail" % "1.9" % "test",
+      "org.jvnet.mock-javamail" % "mock-javamail" % "1.9" % "test",
       compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
     ),
     ramlHyperbusSources := Seq(

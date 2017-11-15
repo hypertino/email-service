@@ -20,7 +20,7 @@ import com.hypertino.service.config.ConfigLoader
 import com.hypertino.services.email.api.EmailsPost
 import com.typesafe.config.Config
 import monix.execution.Scheduler
-//import org.jvnet.mock_javamail.Mailbox
+import org.jvnet.mock_javamail.Mailbox
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
@@ -51,59 +51,39 @@ class EmailServiceSpec extends FlatSpec with Module with BeforeAndAfterAll with 
     val c = hyperbus
       .ask(EmailsPost(api.EmailMessage("test-email", None, Obj.from(
         "user" → Obj.from(
-          "email" → "maqdev@gmail.com",
-          "name" → "Maga"
+          "email" → "john@example.com",
+          "name" → "John"
         )
       ))))
       .runAsync
       .futureValue
 
-//    val inbox = Mailbox.get("john@example.com")
-//    inbox.size shouldBe 1
-//    val msg = inbox.get(0)
-//    msg.getSubject shouldBe "Hello"
-//    msg.getAllRecipients.map(_.asInstanceOf[InternetAddress].getAddress) should contain("john@example.com")
-//    msg.getContent shouldBe "<p>Hello <strong>John</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: color.&quot;'&quot;</p></p>"
-//    inbox.clear()
+    val inbox = Mailbox.get("john@example.com")
+    inbox.size shouldBe 1
+    val msg = inbox.get(0)
+    msg.getSubject shouldBe "Hello"
+    msg.getAllRecipients.map(_.asInstanceOf[InternetAddress].getAddress) should contain("john@example.com")
+    msg.getContent shouldBe "<p>Hello <strong>John</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: color.&quot;'&quot;</p></p>"
+    inbox.clear()
   }
 
-//  "EmailService" should "send email" in {
-//    val c = hyperbus
-//      .ask(EmailsPost(api.EmailMessage("test-email", None, Obj.from(
-//        "user" → Obj.from(
-//          "email" → "john@example.com",
-//          "name" → "John"
-//        )
-//      ))))
-//      .runAsync
-//      .futureValue
-//
-//    val inbox = Mailbox.get("john@example.com")
-//    inbox.size shouldBe 1
-//    val msg = inbox.get(0)
-//    msg.getSubject shouldBe "Hello"
-//    msg.getAllRecipients.map(_.asInstanceOf[InternetAddress].getAddress) should contain("john@example.com")
-//    msg.getContent shouldBe "<p>Hello <strong>John</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: color.&quot;'&quot;</p></p>"
-//    inbox.clear()
-//  }
-//
-//  it should "send email according to language" in {
-//    val c = hyperbus
-//      .ask(EmailsPost(api.EmailMessage("test-email", Some("en-uk"), Obj.from(
-//        "user" → Obj.from(
-//          "email" → "boris@example.com",
-//          "name" → "Boris"
-//        )
-//      ))))
-//      .runAsync
-//      .futureValue
-//
-//    val inbox = Mailbox.get("boris@example.com")
-//    inbox.size shouldBe 1
-//    val msg = inbox.get(0)
-//    msg.getSubject shouldBe "Hello"
-//    msg.getAllRecipients.map(_.asInstanceOf[InternetAddress].getAddress) should contain("boris@example.com")
-//    msg.getContent shouldBe "<p>Hello <strong>Boris</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: colour.&quot;'&quot;</p></p>"
-//    inbox.clear()
-//  }
+  it should "send email according to language" in {
+    val c = hyperbus
+      .ask(EmailsPost(api.EmailMessage("test-email", Some("en-uk"), Obj.from(
+        "user" → Obj.from(
+          "email" → "boris@example.com",
+          "name" → "Boris"
+        )
+      ))))
+      .runAsync
+      .futureValue
+
+    val inbox = Mailbox.get("boris@example.com")
+    inbox.size shouldBe 1
+    val msg = inbox.get(0)
+    msg.getSubject shouldBe "Hello"
+    msg.getAllRecipients.map(_.asInstanceOf[InternetAddress].getAddress) should contain("boris@example.com")
+    msg.getContent shouldBe "<p>Hello <strong>Boris</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: colour.&quot;'&quot;</p></p>"
+    inbox.clear()
+  }
 }
