@@ -88,17 +88,17 @@ class EmailService(implicit val injector: Injector) extends Service with Injecta
           }
           catch {
             case ex: Throwable ⇒
-              val internalError = InternalServerError(ErrorBody("smtp-failure", Some(ex.getMessage)))
+              val internalError = InternalServerError(ErrorBody("smtp_failure", Some(ex.getMessage)))
               logger.error(s"Can't send email #${internalError.body.errorId}", ex)
               throw internalError
           }
           Accepted(EmptyBody)
         }
       } getOrElse {
-        Task.raiseError(BadRequest(ErrorBody("sender-is-not-specified", Some(s"Sender is not specified (and no default is configured)"))))
+        Task.raiseError(BadRequest(ErrorBody("sender_is_not_specified", Some(s"Sender is not specified (and no default is configured)"))))
       }
     } getOrElse {
-      Task.raiseError(BadRequest(ErrorBody("template-not-found", Some(s"Template ${p.body.template} wasn't found"))))
+      Task.raiseError(BadRequest(ErrorBody("template_not_found", Some(s"Template ${p.body.template} wasn't found"))))
     }
   }
 
