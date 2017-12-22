@@ -1,10 +1,10 @@
-crossScalaVersions := Seq("2.12.3", "2.11.11")
+crossScalaVersions := Seq("2.12.4", "2.11.12")
 
 scalaVersion := crossScalaVersions.value.head
 
 lazy val `email-service` = project in file(".") enablePlugins Raml2Hyperbus settings (
     name := "email-service",
-    version := "0.3-SNAPSHOT",
+    version := "0.4-SNAPSHOT",
     organization := "com.hypertino",
     resolvers ++= Seq(
       Resolver.sonatypeRepo("public")

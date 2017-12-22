@@ -4,6 +4,7 @@ import java.util.concurrent.Callable
 import java.util.{Locale, ResourceBundle}
 
 import com.google.common.cache.{Cache, CacheBuilder}
+import com.hypertino.template.utils.resources.Utf8Control
 
 import scala.util.Try
 
@@ -39,8 +40,6 @@ trait ResourceCache {
 
   protected def loadBundle(language: String): ResourceBundle = {
     val locale = Locale.forLanguageTag(language)
-    ResourceBundle.getBundle(bundleName, locale,
-      ResourceBundle.Control.getNoFallbackControl(
-        ResourceBundle.Control.FORMAT_DEFAULT))
+    ResourceBundle.getBundle(bundleName, locale, Utf8Control)
   }
 }
