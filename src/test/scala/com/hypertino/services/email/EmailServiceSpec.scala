@@ -107,7 +107,7 @@ class EmailServiceSpec extends FlatSpec with Module with BeforeAndAfterAll with 
     inbox.clear()
   }
   
-  it should "send email to default language if not matched with any requested accept-language" in {
+  it should "send email by default language if not matched with any requested accept-language" in {
     val c = hyperbus
       .ask(EmailsPost(api.EmailMessage("test-email", Some("fr-CH, de;q=0.9, it;q=0.8"), Obj.from(
         "user" → Obj.from(
@@ -127,7 +127,7 @@ class EmailServiceSpec extends FlatSpec with Module with BeforeAndAfterAll with 
     inbox.clear()
   }
   
-  it should "send email to the most approprite language accroding language-quality-factor" in {
+  it should "send email by the most appropriate language according accept-language quality-factor" in {
     val c = hyperbus
       .ask(EmailsPost(api.EmailMessage("test-email", Some("fr-CH, ru;q=0.9, en-UK;q=0.8, de;q=0.7, *;q=0.5"), Obj.from(
         "user" → Obj.from(
