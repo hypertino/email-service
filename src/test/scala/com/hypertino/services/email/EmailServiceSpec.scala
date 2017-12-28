@@ -29,7 +29,7 @@ import scaldi.Module
 import scala.concurrent.duration._
 
 class EmailServiceSpec extends FlatSpec with Module with BeforeAndAfterAll with ScalaFutures with Matchers with Subscribable {
-  override implicit val patienceConfig = PatienceConfig(timeout = scaled(Span(3, Seconds)))
+  override implicit val patienceConfig = PatienceConfig(timeout = scaled(Span(30, Seconds)))
   implicit val scheduler = monix.execution.Scheduler.Implicits.global
   implicit val mcx = MessagingContext.empty
   bind [Config] to ConfigLoader()

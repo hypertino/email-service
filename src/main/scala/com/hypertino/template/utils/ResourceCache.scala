@@ -20,26 +20,33 @@ trait ResourceCache {
   def r(s: String)(implicit languageRanges: LanguageRanges): String = lookupBundle.getString(s)
 
   protected def lookupBundle(implicit languageRanges: LanguageRanges): ResourceBundle = {
-    languageRanges
+    val allBundles = languageRanges
       .languages
       .flatMap { l ⇒
         val lang = if (l.range == "*") defaultLocale.getLanguage else l.range
         resourceCache.get(lang, new Callable[Option[ResourceBundle]] {
-          override def call() = Try(loadBundle(lang)).toOption
+          override def call() = loadBundle(lang, defaultIfNotMatched = false)
         })
       }
-      .headOption
+
+    allBundles.headOption
       .getOrElse {
-        if (languageRanges.raw != "*")
-          lookupBundle(LanguageRanges("*"))
-        else {
-          throw new RuntimeException(s"Resource bundle $bundleName is not found")
+        loadBundle(defaultLocale.getLanguage, defaultIfNotMatched = true).getOrElse {
+          throw new RuntimeException(s"Resource bundle $bundleName for languages '${languageRanges.raw}' is not found")
         }
       }
   }
 
-  protected def loadBundle(language: String): ResourceBundle = {
+  protected def loadBundle(language: String, defaultIfNotMatched: Boolean): Option[ResourceBundle] = {
     val locale = Locale.forLanguageTag(language)
-    ResourceBundle.getBundle(bundleName, locale, Utf8Control)
+    Try {
+      val b = ResourceBundle.getBundle(bundleName, locale, Utf8Control)
+      if (b.getLocale.getLanguage.isEmpty && !defaultIfNotMatched) {
+        None
+      }
+      else {
+        Some(b)
+      }
+    }.toOption.flatten
   }
 }
