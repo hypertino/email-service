@@ -29,7 +29,7 @@ import scaldi.Module
 import scala.concurrent.duration._
 
 class EmailServiceSpec extends FlatSpec with Module with BeforeAndAfterAll with ScalaFutures with Matchers with Subscribable {
-  override implicit val patienceConfig = PatienceConfig(timeout = scaled(Span(3, Seconds)))
+  override implicit val patienceConfig = PatienceConfig(timeout = scaled(Span(30, Seconds)))
   implicit val scheduler = monix.execution.Scheduler.Implicits.global
   implicit val mcx = MessagingContext.empty
   bind [Config] to ConfigLoader()
@@ -106,4 +106,45 @@ class EmailServiceSpec extends FlatSpec with Module with BeforeAndAfterAll with 
     msg.getContent shouldBe "<p>Hello <strong>Boris</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: цвет.&quot;'&quot;</p></p>"
     inbox.clear()
   }
+  
+  it should "send email by default language if not matched with any requested accept-language" in {
+    val c = hyperbus
+      .ask(EmailsPost(api.EmailMessage("test-email", Some("fr-CH, de;q=0.9, it;q=0.8"), Obj.from(
+        "user" → Obj.from(
+          "email" → "boris@example.com",
+          "name" → "Boris"
+        )
+      ))))
+      .runAsync
+      .futureValue
+    
+    val inbox = Mailbox.get("boris@example.com")
+    inbox.size shouldBe 1
+    val msg = inbox.get(0)
+    msg.getSubject shouldBe "Hello"
+    msg.getAllRecipients.map(_.asInstanceOf[InternetAddress].getAddress) should contain("boris@example.com")
+    msg.getContent shouldBe "<p>Hello <strong>Boris</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: color.&quot;'&quot;</p></p>"
+    inbox.clear()
+  }
+  
+  it should "send email by the most appropriate language according accept-language quality-factor" in {
+    val c = hyperbus
+      .ask(EmailsPost(api.EmailMessage("test-email", Some("fr-CH, ru;q=0.9, en-UK;q=0.8, de;q=0.7, *;q=0.5"), Obj.from(
+        "user" → Obj.from(
+          "email" → "boris@example.com",
+          "name" → "Boris"
+        )
+      ))))
+      .runAsync
+      .futureValue
+    
+    val inbox = Mailbox.get("boris@example.com")
+    inbox.size shouldBe 1
+    val msg = inbox.get(0)
+    msg.getSubject shouldBe "Hello"
+    msg.getAllRecipients.map(_.asInstanceOf[InternetAddress].getAddress) should contain("boris@example.com")
+    msg.getContent shouldBe "<p>Hello <strong>Boris</strong><hr />How are you?<a href=\"http://example.net/abcde\">read more</a><p>color: цвет.&quot;'&quot;</p></p>"
+    inbox.clear()
+  }
+  
 }
