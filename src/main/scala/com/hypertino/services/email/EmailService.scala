@@ -19,9 +19,9 @@ import com.hypertino.hyperbus.Hyperbus
 import com.hypertino.hyperbus.model.{Accepted, BadRequest, DynamicBody, EmptyBody, ErrorBody, InternalServerError}
 import com.hypertino.hyperbus.subscribe.Subscribable
 import com.hypertino.inflector.naming.DashCaseToPascalCaseConverter
+import com.hypertino.langutils.LanguageRanges
 import com.hypertino.service.control.api.Service
 import com.hypertino.services.email.api.EmailsPost
-import com.hypertino.template.utils.LanguageRanges
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.StrictLogging
 import monix.eval.Task

@@ -4,7 +4,7 @@ scalaVersion := crossScalaVersions.value.head
 
 lazy val `email-service` = project in file(".") enablePlugins Raml2Hyperbus settings (
     name := "email-service",
-    version := "0.4.1-SNAPSHOT",
+    version := "0.4.2-SNAPSHOT",
     organization := "com.hypertino",
     resolvers ++= Seq(
       Resolver.sonatypeRepo("public")
@@ -13,6 +13,7 @@ lazy val `email-service` = project in file(".") enablePlugins Raml2Hyperbus sett
       "com.hypertino" %% "hyperbus" % "0.6-SNAPSHOT",
       "com.hypertino" %% "hyperbus-t-inproc" % "0.6-SNAPSHOT" % "test",
       "com.hypertino" %% "service-control" % "0.4.1",
+      "com.hypertino" %% "language-utils" % "0.1.0",
       "com.sun.mail" % "javax.mail" % "1.6.0",
       "com.lihaoyi" %% "scalatags" % "0.6.7",
       "com.google.guava" % "guava" % "19.0",
